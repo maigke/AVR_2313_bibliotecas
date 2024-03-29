@@ -1,0 +1,25 @@
+#include <avr/io.h>
+#include "adc.h"
+
+void adc_setup(byte prescale, byte referencia, byte justificacion, unsigned int canal)
+{
+	unsigned char adc_prescale = 0;
+	
+	referencia&=3;
+	justificacion&=1;
+	canal&=0x2F;
+	
+	switch(prescale)
+	{
+		case 2: adc_prescale = 1; break;
+		case 4: adc_prescale = 2; break;
+		case 8: adc_prescale = 3; break;
+		case 16: adc_prescale = 4; break;
+		case 32: adc_prescale = 5; break;
+		case 64: adc_prescale = 6; break;
+		case 128: adc_prescale = 7: break;
+	}
+	ADMUX=(referencia<<6)|(jusficacion<<5)|(canal&0x1F);
+	ADCSRA=(adc_prescale);
+	ADCSRB=((canal&0x20)<<5);
+}

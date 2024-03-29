@@ -1,0 +1,16 @@
+/**
+@code #include <adc.h> @endcode
+
+@brief
+*/
+
+
+#ifndef ADC_H_INCLUDED
+#define ADC_H_INCLUDED
+#define byte uint8_t
+
+//void timer3_setup(byte mode, int prescale, unsigned char outmode_A, unsigned char outmode_B, unsigned char capture);
+
+void adc_setup(byte prescale, byte referencia, byte justificacion, byte canal);
+
+#endif // ADC_H_INCLUDED

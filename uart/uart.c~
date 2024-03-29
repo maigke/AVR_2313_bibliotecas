@@ -1,0 +1,72 @@
+// uart.c
+// Originally for NerdKits with ATmega168, 14.7456 MHz clock
+// mrobbins@mit.edu
+// Modified for Adafruit ATMega32u4 Breakout, with 16.0000Mhz clock
+// Note, this references serial 1, not 0, since the micro does not have 0.
+// At least for the above breakout, D3 is TX, and D2 RX
+// bp-elec@spaceservices.net
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <avr/io.h>
+#include <inttypes.h>
+#include "uart.h"
+
+void uart_init(void) {
+  // set baud rate
+  UBRR1H = 0;
+  UBRR1L = 103;  // for 38400bps with 16MHz clock, this happened to be a value
+                // of low error that was also listed on minicom, and that the cable
+                // seemed to support. Works well for just text going across, since
+                // code upload is handled via USB/AVR-CDC (Via LUFA Library).
+  // enable uart RX and TX
+  UCSR1B = (1<<RXEN1)|(1<<TXEN1);
+  // set 8N1 frame format
+  UCSR1C = (1<<UCSZ11)|(1<<UCSZ10);
+
+  // set up STDIO handlers so you can use printf, etc
+  fdevopen(&uart_putchar, &uart_getchar);
+}
+
+void uart_write(char x) {
+  // wait for empty receive buffer
+  while ((UCSR1A & (1<<UDRE1))==0);
+  // send
+  UDR1 = x;
+}
+
+uint8_t uart_char_is_waiting(void) {
+  // returns 1 if a character is waiting
+  // returns 0 if not
+  return (UCSR1A & (1<<RXC1));
+}
+
+char uart_read(void) {
+  // wait
+  while(!uart_char_is_waiting());
+  char x = UDR1;
+  return x;
+}
+
+int uart_putchar(char c, FILE *stream) {
+  uart_write(c);
+  return 0;
+}
+
+int uart_getchar(FILE *stream) {
+  int x = uart_read();
+  return x;
+}
+
+
+void uart_puts(const char *s)
+/* print string on lcd (no auto linefeed) */
+{
+    register char c;
+
+    while ( (c = *s++) ) {
+        uart_write(c);
+    }
+
+}/* lcd_puts */
