@@ -1,0 +1,11 @@
+*.hex
+*.obj
+*.pro
+*.PWI
+*.o
+*.eep
+*.elf
+*.zip
+*.DBK
+!*.c
+!*.h
